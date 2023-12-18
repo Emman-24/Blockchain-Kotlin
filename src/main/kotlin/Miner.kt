@@ -7,18 +7,30 @@ open class Miner : BlockChain, Thread() {
     override var chain: MutableList<Block> = mutableListOf()
     override var difficulty: Int = 0
 
+    private val miners = mutableMapOf(
+        "miner1" to 0,
+        "miner2" to 0,
+        "miner3" to 0,
+        "miner4" to 0,
+        "miner5" to 0,
+        "miner6" to 0,
+        "miner7" to 0,
+        "miner8" to 0,
+        "miner9" to 0,
+    )
+
     override fun run() {
         mineBlock()
     }
 
-    private fun mineBlock(blocks: Int = 5) {
+    private fun mineBlock(blocks: Int = 15) {
         synchronized(this) {
             while (chain.size < blocks) {
                 val newBlock = generateBlock()
                 chain.add(newBlock)
-                newBlock.printBlock(newBlock.id, newBlock, newBlock.timeStamp, newBlock.magicNumber)
+                newBlock.printBlock(newBlock, newBlock.timeStamp, newBlock.magicNumber)
                 adjustDifficulty()
-                sleep(2000)
+                sleep(1000)
             }
         }
     }
@@ -38,7 +50,9 @@ open class Miner : BlockChain, Thread() {
             previousHash = previousHash,
             hash = if (hash.startsWith(prefix)) hash else applySha256(data),
             timeStamp = timeStamp,
-            magicNumber = magicNumber
+            transactions = sendVC(),
+            magicNumber = magicNumber,
+            miner = minersBlock()
         )
     }
 
@@ -79,5 +93,40 @@ open class Miner : BlockChain, Thread() {
         } catch (e: Exception) {
             throw RuntimeException(e)
         }
+    }
+
+    private fun sendVC(): List<Transaction> {
+        val sender = minersBlock()
+        val receivers: MutableMap<String, Int> = Persons().names
+        val receiver = receivers.keys.random()
+        val transaction = if (minerGetValue(sender) > 1) {
+            val amount = Random.nextInt(1, getAmount(sender))
+            miners[sender] = miners[sender]!! - amount
+            receivers[receiver] = receivers[receiver]!! + amount
+            Transaction(sender, receiver, amount)
+        } else {
+            Transaction(sender, receiver, 0)
+        }
+        return listOf(transaction)
+
+    }
+
+    private fun minersBlock(): String {
+        val randomMinerIndex = Random.nextInt(1, miners.size)
+        val randomMiner = miners.keys.elementAt(randomMinerIndex)
+        minerReward(randomMiner)
+        return randomMiner
+    }
+
+    private fun minerReward(miner: String) {
+        miners[miner] = miners[miner]!! + 100
+    }
+
+    private fun minerGetValue(miner: String): Int {
+        return miners[miner]!!
+    }
+
+    private fun getAmount(miner: String): Int {
+        return miners[miner]!!
     }
 }
