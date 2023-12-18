@@ -1,5 +1,7 @@
 package org.example
 
 fun main() {
-    println("Hello World!")
+    val blockchain = Blockchain()
+    blockchain.addBlock(5)
+    blockchain.printBlockchain(5)
 }
