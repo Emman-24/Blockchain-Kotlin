@@ -19,8 +19,28 @@ data class Block(
                     "${block.previousHash}\n" +
                     "Hash of the block:\n" +
                     "${block.hash}\n" +
+                    "Block data:${
+                        if (block.id == 1) {
+                            " no messages\n"
+                        } else {
+                            "\n${randomMessages()}\n"
+                        }
+                    }" +
                     "Block was generating for 0 seconds\n"
         )
+    }
+
+    private fun randomMessages(): String {
+        val messages = mutableListOf(
+            "Tom: Hey, I'm first!",
+            "Sarah: It's not fair!",
+            "Sarah: You always will be first because it is your blockchain!",
+            "Sarah: Anyway, thank you for this amazing chat.",
+            "Tom: You're welcome :)",
+            "Nick: Hey Tom, nice chat!",
+        )
+        val number = (1..messages.size).random()
+        return messages.take(number).joinToString(separator = "\n")
     }
 
 
