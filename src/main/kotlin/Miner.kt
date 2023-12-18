@@ -80,5 +80,4 @@ open class Miner : BlockChain, Thread() {
             throw RuntimeException(e)
         }
     }
-
 }
